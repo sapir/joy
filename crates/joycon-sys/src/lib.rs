@@ -33,7 +33,7 @@ macro_rules! raw_enum {
             $($varname:ident $varnamemut:ident: $id:ident = $var:ty),+
         }
     ) => {
-        #[repr(packed)]
+        #[repr(C, packed)]
         #[derive(Copy, Clone)]
         pub struct $struct {
             $($preid: $preidty,)?
@@ -41,7 +41,7 @@ macro_rules! raw_enum {
             $($postid: $postidty,)?
             u: $union,
         }
-        #[repr(packed)]
+        #[repr(C, packed)]
         #[derive(Copy, Clone)]
         union $union {
             $($varname: $var,)*
