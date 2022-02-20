@@ -89,9 +89,14 @@ impl JoyCon {
 
     #[instrument(level = "trace", skip(self), fields(special, report))]
     pub fn recv(&mut self) -> Result<InputReport> {
+        let mut buf = [0u8; 362];
+        let nb_read = self.device.read(&mut buf)?;
+
         let mut report = InputReport::new();
-        let nb_read = self.device.read(report.as_bytes_mut())?;
-        assert_eq!(nb_read, report.len());
+        assert!(nb_read >= report.len());
+        assert!(buf[nb_read..].iter().copied().all(|b| b == 0));
+        let report_len = report.len();
+        report.as_bytes_mut().copy_from_slice(&buf[..report_len]);
         Span::current()
             .record("special", &report.is_special())
             .record("report", &debug(report));
